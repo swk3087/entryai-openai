@@ -1,3 +1,5 @@
+import { IAIProjectMeta } from '../../common/ai';
+
 export default class {
     static get PERSIST() {
         return 'persist:storage';
@@ -19,6 +21,10 @@ export default class {
         return 'localStorageProjectReload';
     }
 
+    static get LOCAL_STORAGE_PROJECT_META_KEY() {
+        return 'localStorageProjectMeta';
+    }
+
     static get LOCAL_STORAGE_LANG() {
         return 'lang';
     }
@@ -31,13 +37,16 @@ export default class {
         return 'workspace-interface';
     }
 
-    static saveProject(project: IEntry.Project | string) {
+    static saveProject(project: IEntry.Project | string, projectMeta?: IAIProjectMeta) {
         if (!project) {
             this.clearSavedProject();
             return;
         }
         const projectJson = typeof project === 'string' ? project : JSON.stringify(project);
         localStorage.setItem(this.LOCAL_STORAGE_KEY, projectJson);
+        if (projectMeta) {
+            localStorage.setItem(this.LOCAL_STORAGE_PROJECT_META_KEY, JSON.stringify(projectMeta));
+        }
     }
 
     static loadProject() {
@@ -47,8 +56,38 @@ export default class {
         }
     }
 
+    static loadProjectMeta(): IAIProjectMeta | undefined {
+        const rawMeta = localStorage.getItem(this.LOCAL_STORAGE_PROJECT_META_KEY);
+        if (!rawMeta) {
+            return undefined;
+        }
+
+        try {
+            const parsedMeta = JSON.parse(rawMeta);
+            if (!parsedMeta || typeof parsedMeta !== 'object') {
+                return undefined;
+            }
+
+            if (typeof parsedMeta.aiProjectId !== 'string' || !parsedMeta.aiProjectId.trim()) {
+                return undefined;
+            }
+
+            return {
+                aiProjectId: parsedMeta.aiProjectId,
+                savedPath:
+                    typeof parsedMeta.savedPath === 'string' && parsedMeta.savedPath.trim() ?
+                        parsedMeta.savedPath :
+                        undefined,
+            };
+        } catch (error) {
+            console.warn('Failed to parse saved project meta:', error);
+            return undefined;
+        }
+    }
+
     static clearSavedProject() {
-        return localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+        localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+        return localStorage.removeItem(this.LOCAL_STORAGE_PROJECT_META_KEY);
     }
 
     static saveTempProject(project: IEntry.Project | string) {

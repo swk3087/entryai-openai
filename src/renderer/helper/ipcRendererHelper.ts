@@ -1,6 +1,13 @@
 import RendererUtils from './rendererUtils';
 import StorageManager from './storageManager';
 import EntryModalHelper from './entry/entryModalHelper';
+import {
+    IAIConversation,
+    IAIGenerateProjectRequest,
+    IAIPanelSettings,
+    IAIPanelState,
+    IAIProjectUpdateResponse,
+} from '../../common/ai';
 
 const { ipcInvoke } = window;
 
@@ -156,5 +163,29 @@ export default class {
 
     static getExistSoundFilePath(sound: { filename: string; ext?: string }) {
         return ipcInvoke('getExistSoundFilePath', sound);
+    }
+
+    static getAIPanelState(projectKey: string) {
+        return ipcInvoke<IAIPanelState>('getAIPanelState', projectKey);
+    }
+
+    static saveAISettings(settings: Partial<IAIPanelSettings>) {
+        return ipcInvoke<IAIPanelSettings>('saveAISettings', settings);
+    }
+
+    static saveAIConversation(projectKey: string, conversation: IAIConversation) {
+        return ipcInvoke<IAIConversation>('saveAIConversation', projectKey, conversation);
+    }
+
+    static clearAIConversation(projectKey: string) {
+        return ipcInvoke<void>('clearAIConversation', projectKey);
+    }
+
+    static copyAIConversation(sourceProjectKey: string, targetProjectKey: string, projectName?: string) {
+        return ipcInvoke<void>('copyAIConversation', sourceProjectKey, targetProjectKey, projectName);
+    }
+
+    static generateAIProjectUpdate(request: IAIGenerateProjectRequest) {
+        return ipcInvoke<IAIProjectUpdateResponse>('generateAIProjectUpdate', request);
     }
 }

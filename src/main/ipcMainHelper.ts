@@ -8,6 +8,13 @@ import checkUpdateRequest from './utils/network/checkUpdate';
 import createLogger from './utils/functions/createLogger';
 import isValidAsarFile, { getPapagoHeaderInfoByValidator } from './utils/functions/isValidAsarFile';
 import fileUtils from './fileUtils';
+import AIStateManager from './ai/aiStateManager';
+import OpenAIProjectEditor from './ai/openAIProjectEditor';
+import {
+    IAIConversation,
+    IAIGenerateProjectRequest,
+    IAIPanelSettings,
+} from '../common/ai';
 require('@electron/remote/main').initialize();
 
 const logger = createLogger('main/ipcMainHelper.ts');
@@ -49,6 +56,12 @@ new (class {
         ipcMain.handle('saveSoundBuffer', this.saveSoundBuffer.bind(this));
         ipcMain.handle('getExistSoundFilePath', this.getExistSoundFilePath.bind(this));
         ipcMain.handle('getPapagoHeaderInfo', this.getPapagoHeaderInfo.bind(this));
+        ipcMain.handle('getAIPanelState', this.getAIPanelState.bind(this));
+        ipcMain.handle('saveAISettings', this.saveAISettings.bind(this));
+        ipcMain.handle('saveAIConversation', this.saveAIConversation.bind(this));
+        ipcMain.handle('clearAIConversation', this.clearAIConversation.bind(this));
+        ipcMain.handle('copyAIConversation', this.copyAIConversation.bind(this));
+        ipcMain.handle('generateAIProjectUpdate', this.generateAIProjectUpdate.bind(this));
     }
 
     async saveProject(event: IpcMainInvokeEvent, project: ObjectLike, targetPath: string) {
@@ -262,6 +275,42 @@ new (class {
 
     async getPapagoHeaderInfo(event: IpcMainInvokeEvent) {
         return await getPapagoHeaderInfoByValidator();
+    }
+
+    async getAIPanelState(event: IpcMainInvokeEvent, projectKey: string) {
+        return AIStateManager.getPanelState(projectKey);
+    }
+
+    async saveAISettings(event: IpcMainInvokeEvent, settings: Partial<IAIPanelSettings>) {
+        return AIStateManager.saveSettings(settings);
+    }
+
+    async saveAIConversation(
+        event: IpcMainInvokeEvent,
+        projectKey: string,
+        conversation: IAIConversation
+    ) {
+        return AIStateManager.saveConversation(projectKey, conversation);
+    }
+
+    async clearAIConversation(event: IpcMainInvokeEvent, projectKey: string) {
+        return AIStateManager.clearConversation(projectKey);
+    }
+
+    async copyAIConversation(
+        event: IpcMainInvokeEvent,
+        sourceProjectKey: string,
+        targetProjectKey: string,
+        projectName?: string
+    ) {
+        return AIStateManager.copyConversation(sourceProjectKey, targetProjectKey, projectName);
+    }
+
+    async generateAIProjectUpdate(
+        event: IpcMainInvokeEvent,
+        request: IAIGenerateProjectRequest
+    ) {
+        return OpenAIProjectEditor.generateProjectUpdate(request);
     }
 
     openUrl(event: IpcMainInvokeEvent, url: string) {

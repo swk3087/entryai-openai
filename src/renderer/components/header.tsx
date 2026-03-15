@@ -22,6 +22,9 @@ interface IProps extends IReduxDispatch, IReduxState {
     onProgramLanguageChanged: (key: string) => void;
     onLoadProject: () => void;
     onReloadProject: () => void;
+    onToggleAIPanel: () => void;
+    isAIPanelOpen: boolean;
+    isAIGenerating: boolean;
     programLanguageMode: string;
     executionStatus: {
         canRedo: boolean;
@@ -236,6 +239,9 @@ class Header extends Component<IProps, IState> {
                 lang: '',
                 mode: '',
             }, common, programLanguageMode, executionStatus = { canRedo: false, canUndo: false },
+            onToggleAIPanel,
+            isAIPanelOpen,
+            isAIGenerating,
         } = this.props;
         const { canRedo = false, canUndo = false } = executionStatus;
         const { projectName = RendererUtils.getDefaultProjectName(), isValidProduct } = common;
@@ -398,22 +404,37 @@ class Header extends Component<IProps, IState> {
                     {
                         /* 언어 변경 */
                         mode === 'workspace' &&
-                        (<div className={'lang_select_box'}>
-                            <a
-                                className={`${'select_link'} ${'ico_white_select_arr'} ${
-                                    dropdownType === 'language' ? 'on' : ''
-                                    }`}
-                                ref={(dom) => (this.dropdownList.language = dom)}
-                                onClick={() => {
-                                    this.handleDropdownClick('language');
-                                }}
-                            >
-                                {this.getLangValue()}
-                            </a>
-                            <div className={'tooltip_box'}>
-                                {this.makeDropdown('language', this.languageList)}
+                        (
+                            <div className={'group_inner'}>
+                                <div className={'work_space'}>
+                                    <a
+                                        title={'AI 편집기'}
+                                        className={`btn_work_space btn_workspace_ai ${
+                                            isAIPanelOpen ? 'on' : ''
+                                        } ${isAIGenerating ? 'generating' : ''}`}
+                                        onClick={onToggleAIPanel}
+                                    >
+                                        AI
+                                    </a>
+                                </div>
+                                <div className={'lang_select_box'}>
+                                    <a
+                                        className={`${'select_link'} ${'ico_white_select_arr'} ${
+                                            dropdownType === 'language' ? 'on' : ''
+                                            }`}
+                                        ref={(dom) => (this.dropdownList.language = dom)}
+                                        onClick={() => {
+                                            this.handleDropdownClick('language');
+                                        }}
+                                    >
+                                        {this.getLangValue()}
+                                    </a>
+                                    <div className={'tooltip_box'}>
+                                        {this.makeDropdown('language', this.languageList)}
+                                    </div>
+                                </div>
                             </div>
-                        </div>)
+                        )
                     }
                 </div>
             </header>

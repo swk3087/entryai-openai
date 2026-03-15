@@ -23,10 +23,25 @@ import { IMapDispatchToProps, IMapStateToProps } from '../store';
 import DragAndDropContainer from './DragAndDropContainer';
 import EntryModalHelper from '../helper/entry/entryModalHelper';
 import ipcRendererHelper from '../helper/ipcRendererHelper';
+import AIPanel from '../ai/AIPanel';
+import { IAIProjectMeta, IAIProjectUpdateResponse } from '../../common/ai';
+import { getFileAIProjectKey, resolveAIProjectIdentity } from '../ai/projectIdentity';
 
 interface IProps extends IReduxDispatch, IReduxState {}
 
-class Workspace extends Component<IProps> {
+interface IWorkspaceState {
+    programLanguageMode: string;
+    executionStatus: {
+        canRedo: boolean;
+        canUndo: boolean;
+    };
+    modalStyle: Object;
+    aiProjectKey: string;
+    isAIPanelOpen: boolean;
+    isAIGenerating: boolean;
+}
+
+class Workspace extends Component<IProps, IWorkspaceState> {
     private lastHwName?: string;
     private projectSavedPath?: string;
     private projectParent?: string;
@@ -34,6 +49,7 @@ class Workspace extends Component<IProps> {
     private isFirstRender = true;
     private isSavingCanvasData = false;
     private isSaveProject = false;
+    private currentAIProjectId = '';
     private defaultInitOption = {
         type: 'workspace',
         backpackDisable: true,
@@ -50,13 +66,16 @@ class Workspace extends Component<IProps> {
         aiLearningEnable: true,
         paintMode: 'entry-paint',
     };
-    state = {
+    state: IWorkspaceState = {
         programLanguageMode: 'block',
         executionStatus: {
             canRedo: false,
             canUndo: false,
         },
         modalStyle: {},
+        aiProjectKey: '',
+        isAIPanelOpen: false,
+        isAIGenerating: false,
     };
 
     get initOption() {
@@ -91,7 +110,8 @@ class Workspace extends Component<IProps> {
             await this._waitFontLoad();
             try {
                 const project = await EntryUtils.getSavedProject();
-                await this.loadProject(project);
+                const projectMeta = project ? LocalStorageManager.loadProjectMeta() : undefined;
+                await this.loadProject(project, projectMeta);
             } catch (e) {
                 console.error(e);
                 this.showModalProgress(
@@ -373,8 +393,12 @@ class Workspace extends Component<IProps> {
         const project = Entry.exportProject();
         if (project) {
             project.name = this._getProjectName();
+            project.savedPath = this.projectSavedPath;
             Object.assign(project, option);
-            LocalStorageManager.saveProject(project);
+            LocalStorageManager.saveProject(project, {
+                aiProjectId: this.currentAIProjectId,
+                savedPath: this.projectSavedPath,
+            });
         }
     }, 300);
 
@@ -442,6 +466,7 @@ class Workspace extends Component<IProps> {
         const { persist } = this.props;
         const { mode } = persist;
         const projectName = this._getProjectName();
+        const previousProjectKey = this.state.aiProjectKey;
 
         const saveFunction = async (filePath: string | undefined) => {
             if (!filePath) {
@@ -470,6 +495,17 @@ class Workspace extends Component<IProps> {
                 await IpcRendererHelper.saveProject(project, filePath);
                 await RendererUtils.clearTempProject({ saveTemp: true });
                 this.projectSavedPath = filePath;
+                const nextProjectKey = getFileAIProjectKey(filePath);
+                if (previousProjectKey && previousProjectKey !== nextProjectKey) {
+                    await IpcRendererHelper.copyAIConversation(
+                        previousProjectKey,
+                        nextProjectKey,
+                        projectName
+                    );
+                }
+                this.setState({
+                    aiProjectKey: nextProjectKey,
+                });
 
                 // 모달 해제 후 엔트리 토스트로 저장처리
                 this.hideModalProgress();
@@ -570,10 +606,17 @@ class Workspace extends Component<IProps> {
      * 프로젝트를 로드한 후, 이벤트 연결을 시도한다.
      * @param{Object?} project undefined 인 경우 신규 프로젝트로 생성
      */
-    loadProject = async (project?: any) => {
+    loadProject = async (project?: any, aiProjectMeta?: IAIProjectMeta) => {
         const { CommonActions, PersistActions, persist } = this.props;
         const { mode: currentWorkspaceMode } = persist;
         let projectWorkspaceMode = currentWorkspaceMode;
+        const savedPath = project?.savedPath || aiProjectMeta?.savedPath;
+        const aiIdentity = resolveAIProjectIdentity(savedPath, aiProjectMeta);
+
+        this.currentAIProjectId = aiIdentity.aiProjectId;
+        this.setState({
+            aiProjectKey: aiIdentity.aiProjectKey,
+        });
 
         if (project) {
             this.projectSavedPath = project.savedPath || '';
@@ -636,7 +679,53 @@ class Workspace extends Component<IProps> {
     reloadProject = async () => {
         const project = Entry.exportProject();
         project.name = this._getProjectName();
-        await this.loadProject(project);
+        await this.loadProject(project, {
+            aiProjectId: this.currentAIProjectId,
+            savedPath: this.projectSavedPath,
+        });
+    };
+
+    handleToggleAIPanel = () => {
+        this.setState((state) => ({
+            isAIPanelOpen: !state.isAIPanelOpen,
+        }));
+    };
+
+    handleAIGenerationStateChange = (isAIGenerating: boolean) => {
+        this.setState({
+            isAIGenerating,
+        });
+
+        if (isAIGenerating) {
+            this.showModalProgress(
+                'progress',
+                'AI가 작품을 수정하는 중입니다.',
+                '잠시만 기다려 주세요.',
+                { width: 260 }
+            );
+        } else {
+            this.hideModalProgress();
+        }
+    };
+
+    handleAIProjectApply = async (response: IAIProjectUpdateResponse) => {
+        const { persist } = this.props;
+        const project = {
+            ...response.updatedProject,
+            name: response.updatedProject.name || this._getProjectName(),
+            savedPath: this.projectSavedPath,
+            parent: this.projectParent,
+            isPracticalCourse:
+                typeof response.updatedProject.isPracticalCourse === 'boolean' ?
+                    response.updatedProject.isPracticalCourse :
+                    persist.mode === 'practical_course',
+        };
+
+        await this.loadProject(project, {
+            aiProjectId: this.currentAIProjectId,
+            savedPath: this.projectSavedPath,
+        });
+        this.handleStorageProjectSave();
     };
 
     handleProgramLanguageModeChanged = (mode: string) => {
@@ -692,7 +781,13 @@ class Workspace extends Component<IProps> {
     };
 
     render() {
-        const { programLanguageMode, executionStatus } = this.state;
+        const {
+            programLanguageMode,
+            executionStatus,
+            aiProjectKey,
+            isAIPanelOpen,
+            isAIGenerating,
+        } = this.state;
         const { modal } = this.props;
         const { isShow, data } = modal;
         const { title, type, description } = data;
@@ -711,17 +806,30 @@ class Workspace extends Component<IProps> {
                         }
                     }}
                 />
-                <div>
+                <div className={'workspace_shell'}>
                     <Header
                         onSaveAction={this.handleSaveAction}
                         onFileAction={this.handleFileAction}
                         onReloadProject={this.reloadProject}
                         onLoadProject={this.loadProject}
+                        onToggleAIPanel={this.handleToggleAIPanel}
+                        isAIPanelOpen={isAIPanelOpen}
+                        isAIGenerating={isAIGenerating}
                         onProgramLanguageChanged={this.handleProgramLanguageModeChanged}
                         programLanguageMode={programLanguageMode}
                         executionStatus={executionStatus}
                     />
                     <div ref={this.container} className="workspace" />
+                    {isAIPanelOpen && (
+                        <AIPanel
+                            projectKey={aiProjectKey}
+                            projectName={this._getProjectName()}
+                            isGenerating={isAIGenerating}
+                            onClose={this.handleToggleAIPanel}
+                            onApplyProject={this.handleAIProjectApply}
+                            onGenerationStateChange={this.handleAIGenerationStateChange}
+                        />
+                    )}
                     {isShow && (
                         <ModalProgress
                             title={title}

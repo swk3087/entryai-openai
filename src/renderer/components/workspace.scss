@@ -92,6 +92,11 @@ $scene-text-skeleton: linear-gradient(#e2e2e2 $scene-btn-height, transparent 0);
 .ws {
     background: white;
 
+    .workspace_shell {
+        height: 100%;
+        position: relative;
+    }
+
     .header {
         height: 43px;
         background-color: #d8d8d8;

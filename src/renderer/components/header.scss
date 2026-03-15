@@ -316,6 +316,25 @@
     background: url(../renderer/resources/images/gnb/btn_workspace_help.png) no-repeat;
     background-size: 18px auto;
 }
+.btn_workspace_ai {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+
+    &.generating {
+        background-color: #3f6fe9;
+        border-color: #a9c0ff;
+    }
+}
+.btn_workspace_ai:before,
+.btn_workspace_ai:after {
+    display: none;
+}
 .btn_workspace_print {
     background: url(../renderer/resources/images/gnb/btn_workspace_print.png) no-repeat;
     background-size: 32px auto;
