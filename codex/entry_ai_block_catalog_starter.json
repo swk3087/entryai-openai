@@ -1,0 +1,1644 @@
+{
+  "meta": {
+    "title": "Entry AI block catalog starter",
+    "version": "0.1",
+    "language": "ko",
+    "note": "alias는 AI용으로 정한 추천 식별자이며, EntryJS의 공식 내부 block id를 검증한 값은 아님. display_name_ko는 공식 사용자 문서의 표기 그대로 옮겼다.",
+    "source_basis": [
+      "Entry Docs user wiki block pages",
+      "Entry Docs Project Data/Object Data/Function Data"
+    ]
+  },
+  "project_schema": {
+    "project_fields": [
+      "speed",
+      "objects",
+      "variables",
+      "messages",
+      "functions",
+      "scenes",
+      "interface",
+      "tables",
+      "learning",
+      "aiUtilizeBlocks",
+      "expansionBlocks",
+      "hardwareLiteBlocks"
+    ],
+    "object_fields": [
+      "id",
+      "name",
+      "text",
+      "objectType",
+      "scene",
+      "lock",
+      "rotateMethod",
+      "entity",
+      "script",
+      "sprite",
+      "selectedPictureId"
+    ],
+    "function_fields": [
+      "id",
+      "content",
+      "type",
+      "useLocalVariables",
+      "localVariables"
+    ],
+    "object_types": [
+      "sprite",
+      "textBox"
+    ],
+    "rotate_methods": [
+      "free",
+      "vertical",
+      "none"
+    ],
+    "function_types": [
+      "normal",
+      "value"
+    ]
+  },
+  "categories": [
+    {
+      "key": "start",
+      "display_name_ko": "시작 블록",
+      "purpose": "이벤트 시작, 신호, 장면 전환"
+    },
+    {
+      "key": "flow",
+      "display_name_ko": "흐름 블록",
+      "purpose": "대기, 반복, 조건, 중단"
+    },
+    {
+      "key": "motion",
+      "display_name_ko": "움직임 블록",
+      "purpose": "위치, 이동, 회전"
+    },
+    {
+      "key": "looks",
+      "display_name_ko": "생김새 블록",
+      "purpose": "보이기, 말풍선, 모양, 효과, 순서"
+    },
+    {
+      "key": "brush",
+      "display_name_ko": "붓 블록",
+      "purpose": "그리기, 채우기, 도장"
+    },
+    {
+      "key": "text",
+      "display_name_ko": "글상자 블록",
+      "purpose": "글상자 읽기/쓰기"
+    },
+    {
+      "key": "sound",
+      "display_name_ko": "소리 블록",
+      "purpose": "소리 재생, 음량, 재생속도, 배경음악"
+    },
+    {
+      "key": "data",
+      "display_name_ko": "자료 블록",
+      "purpose": "대답창, 변수, 리스트"
+    },
+    {
+      "key": "function",
+      "display_name_ko": "함수 블록",
+      "purpose": "사용자 정의 함수"
+    },
+    {
+      "key": "table",
+      "display_name_ko": "데이터 분석 블록",
+      "purpose": "테이블 편집/조회"
+    },
+    {
+      "key": "ai",
+      "display_name_ko": "AI 블록",
+      "purpose": "번역, 음성/영상 인식, 학습 모델"
+    },
+    {
+      "key": "expansion",
+      "display_name_ko": "확장 블록",
+      "purpose": "날씨/행사/재난문자/국민행동요령 등 외부 API"
+    },
+    {
+      "key": "hardware",
+      "display_name_ko": "하드웨어 블록",
+      "purpose": "보드/모듈/로봇 제어"
+    }
+  ],
+  "blocks": [
+    {
+      "category": "start",
+      "alias": "when_run_button_clicked",
+      "display_name_ko": "시작하기 버튼을 클릭했을 때",
+      "kind": "hat",
+      "params": [],
+      "summary": "시작 버튼 클릭 시 아래 블록 묶음을 실행한다.",
+      "ai_usage_hint": "프로그램의 대표 진입점으로 사용."
+    },
+    {
+      "category": "start",
+      "alias": "when_key_pressed",
+      "display_name_ko": "[q] 키를 눌렀을 때",
+      "kind": "hat",
+      "params": [
+        {
+          "name": "key",
+          "type": "enum",
+          "example": "스페이스"
+        }
+      ],
+      "summary": "선택한 키를 누르면 실행한다.",
+      "ai_usage_hint": "조작형 게임 입력에 적합."
+    },
+    {
+      "category": "start",
+      "alias": "when_mouse_clicked",
+      "display_name_ko": "마우스를 클릭했을 때",
+      "kind": "hat",
+      "params": [],
+      "summary": "실행 화면에서 마우스 클릭 시 실행한다.",
+      "ai_usage_hint": "전역 클릭 이벤트."
+    },
+    {
+      "category": "start",
+      "alias": "when_mouse_released",
+      "display_name_ko": "마우스 클릭을 해제했을 때",
+      "kind": "hat",
+      "params": [],
+      "summary": "마우스 클릭 해제 시 실행한다.",
+      "ai_usage_hint": "드래그 종료 처리용."
+    },
+    {
+      "category": "start",
+      "alias": "when_object_clicked",
+      "display_name_ko": "오브젝트를 클릭했을 때",
+      "kind": "hat",
+      "params": [],
+      "summary": "이 오브젝트를 클릭하면 실행한다.",
+      "ai_usage_hint": "버튼/캐릭터 클릭 반응."
+    },
+    {
+      "category": "start",
+      "alias": "when_object_released",
+      "display_name_ko": "오브젝트 클릭을 해제했을 때",
+      "kind": "hat",
+      "params": [],
+      "summary": "이 오브젝트 클릭을 해제하면 실행한다.",
+      "ai_usage_hint": "누른 뒤 놓기 동작."
+    },
+    {
+      "category": "start",
+      "alias": "when_message_received",
+      "display_name_ko": "[신호] 신호를 받았을 때",
+      "kind": "hat",
+      "params": [
+        {
+          "name": "message",
+          "type": "message"
+        }
+      ],
+      "summary": "선택한 신호를 받으면 실행한다.",
+      "ai_usage_hint": "오브젝트 간 통신 진입점."
+    },
+    {
+      "category": "start",
+      "alias": "broadcast_message",
+      "display_name_ko": "[신호] 신호 보내기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "message",
+          "type": "message"
+        }
+      ],
+      "summary": "선택한 신호를 보낸다.",
+      "ai_usage_hint": "장면/오브젝트 동시 반응 유도."
+    },
+    {
+      "category": "start",
+      "alias": "broadcast_message_and_wait",
+      "display_name_ko": "[신호] 신호 보내고 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "message",
+          "type": "message"
+        }
+      ],
+      "summary": "신호를 보낸 뒤 해당 신호를 받은 블록들이 끝날 때까지 기다린다.",
+      "ai_usage_hint": "순차 제어가 필요할 때."
+    },
+    {
+      "category": "start",
+      "alias": "when_scene_started",
+      "display_name_ko": "장면이 시작되었을 때",
+      "kind": "hat",
+      "params": [],
+      "summary": "장면이 시작되면 실행한다.",
+      "ai_usage_hint": "장면 전환 직후 초기화에 적합."
+    },
+    {
+      "category": "start",
+      "alias": "start_scene",
+      "display_name_ko": "[장면 1] 시작하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "scene",
+          "type": "scene"
+        }
+      ],
+      "summary": "선택한 장면을 시작한다.",
+      "ai_usage_hint": "명시적 장면 전환."
+    },
+    {
+      "category": "start",
+      "alias": "start_prev_next_scene",
+      "display_name_ko": "[다음] 장면 시작하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "direction",
+          "type": "enum",
+          "example": "다음"
+        }
+      ],
+      "summary": "이전/다음 장면을 시작한다.",
+      "ai_usage_hint": "간단한 페이지형 흐름용."
+    },
+    {
+      "category": "flow",
+      "alias": "wait_seconds",
+      "display_name_ko": "(2) 초 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "seconds",
+          "type": "number",
+          "min": 0
+        }
+      ],
+      "summary": "입력한 시간만큼 기다린 후 다음 블록이 동작한다.",
+      "ai_usage_hint": "애니메이션 템포 조절."
+    },
+    {
+      "category": "flow",
+      "alias": "repeat_n",
+      "display_name_ko": "(10) 번 반복하기",
+      "kind": "c-block",
+      "params": [
+        {
+          "name": "count",
+          "type": "number",
+          "min": 0
+        },
+        {
+          "name": "body",
+          "type": "statement_list"
+        }
+      ],
+      "summary": "입력한 횟수만큼 감싼 블록을 반복한다.",
+      "ai_usage_hint": "고정 반복."
+    },
+    {
+      "category": "flow",
+      "alias": "repeat_forever",
+      "display_name_ko": "계속 반복하기",
+      "kind": "c-block",
+      "params": [
+        {
+          "name": "body",
+          "type": "statement_list"
+        }
+      ],
+      "summary": "감싼 블록을 계속 반복한다.",
+      "ai_usage_hint": "게임 루프/지속 행동."
+    },
+    {
+      "category": "flow",
+      "alias": "repeat_until_or_while",
+      "display_name_ko": "<참> [이 될 때까지] 반복하기",
+      "kind": "c-block",
+      "params": [
+        {
+          "name": "condition",
+          "type": "boolean"
+        },
+        {
+          "name": "mode",
+          "type": "enum",
+          "example": "이 될 때까지"
+        },
+        {
+          "name": "body",
+          "type": "statement_list"
+        }
+      ],
+      "summary": "조건에 따라 참이 될 때까지 또는 참인 동안 반복한다.",
+      "ai_usage_hint": "상태 기반 반복."
+    },
+    {
+      "category": "flow",
+      "alias": "break_repeat",
+      "display_name_ko": "반복 중단하기",
+      "kind": "stack",
+      "params": [],
+      "summary": "가장 가까운 반복 블록을 즉시 멈춘다.",
+      "ai_usage_hint": "반복 탈출."
+    },
+    {
+      "category": "flow",
+      "alias": "continue_repeat",
+      "display_name_ko": "이번 반복 건너뛰기",
+      "kind": "stack",
+      "params": [],
+      "summary": "현재 반복 회차만 건너뛰고 다음 반복으로 넘어간다.",
+      "ai_usage_hint": "조건 불충족 회차 스킵."
+    },
+    {
+      "category": "flow",
+      "alias": "if_then",
+      "display_name_ko": "만일 <참> 이라면",
+      "kind": "c-block",
+      "params": [
+        {
+          "name": "condition",
+          "type": "boolean"
+        },
+        {
+          "name": "body",
+          "type": "statement_list"
+        }
+      ],
+      "summary": "조건이 참일 때만 감싼 블록을 실행한다.",
+      "ai_usage_hint": "단일 분기."
+    },
+    {
+      "category": "flow",
+      "alias": "if_then_else",
+      "display_name_ko": "만일 <참> (이)라면 아니면",
+      "kind": "if-else",
+      "params": [
+        {
+          "name": "condition",
+          "type": "boolean"
+        },
+        {
+          "name": "then_body",
+          "type": "statement_list"
+        },
+        {
+          "name": "else_body",
+          "type": "statement_list"
+        }
+      ],
+      "summary": "조건 참/거짓에 따라 다른 블록을 실행한다.",
+      "ai_usage_hint": "분기 처리."
+    },
+    {
+      "category": "flow",
+      "alias": "wait_until",
+      "display_name_ko": "<참> 이(가) 될 때까지 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "condition",
+          "type": "boolean"
+        }
+      ],
+      "summary": "조건이 참이 될 때까지 기다린다.",
+      "ai_usage_hint": "비동기 상태 대기."
+    },
+    {
+      "category": "flow",
+      "alias": "stop_scripts",
+      "display_name_ko": "[모든] 코드 멈추기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "target",
+          "type": "enum",
+          "example": "모든"
+        }
+      ],
+      "summary": "선택한 범위의 코드를 즉시 멈춘다.",
+      "ai_usage_hint": "전역 정지/자기만 정지."
+    },
+    {
+      "category": "motion",
+      "alias": "move_by_direction",
+      "display_name_ko": "이동 방향으로 (10) 만큼 움직이기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "distance",
+          "type": "number"
+        }
+      ],
+      "summary": "이동 방향 화살표 기준으로 거리를 이동한다.",
+      "ai_usage_hint": "기본 이동."
+    },
+    {
+      "category": "motion",
+      "alias": "bounce_if_on_edge",
+      "display_name_ko": "화면 끝에 닿으면 튕기기",
+      "kind": "stack",
+      "params": [],
+      "summary": "화면 끝에 닿으면 벽 반사처럼 방향을 바꾼다.",
+      "ai_usage_hint": "벽 튕김 캐릭터/공."
+    },
+    {
+      "category": "motion",
+      "alias": "change_x_by",
+      "display_name_ko": "x 좌표를 (10) 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "dx",
+          "type": "number"
+        }
+      ],
+      "summary": "x 좌표를 상대적으로 변경한다.",
+      "ai_usage_hint": "좌우 이동."
+    },
+    {
+      "category": "motion",
+      "alias": "change_y_by",
+      "display_name_ko": "y 좌표를 (10) 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "dy",
+          "type": "number"
+        }
+      ],
+      "summary": "y 좌표를 상대적으로 변경한다.",
+      "ai_usage_hint": "상하 이동."
+    },
+    {
+      "category": "motion",
+      "alias": "glide_by_xy",
+      "display_name_ko": "(2) 초 동안 x: (10) y: (10) 만큼 움직이기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "seconds",
+          "type": "number"
+        },
+        {
+          "name": "dx",
+          "type": "number"
+        },
+        {
+          "name": "dy",
+          "type": "number"
+        }
+      ],
+      "summary": "입력한 시간 동안 현재 위치에서 상대 이동한다.",
+      "ai_usage_hint": "부드러운 이동."
+    },
+    {
+      "category": "motion",
+      "alias": "set_x",
+      "display_name_ko": "x: (10) 위치로 이동하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "x",
+          "type": "number"
+        }
+      ],
+      "summary": "x 좌표를 절대 위치로 이동한다.",
+      "ai_usage_hint": "정렬/스냅."
+    },
+    {
+      "category": "motion",
+      "alias": "set_y",
+      "display_name_ko": "y: (10) 위치로 이동하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "y",
+          "type": "number"
+        }
+      ],
+      "summary": "y 좌표를 절대 위치로 이동한다.",
+      "ai_usage_hint": "정렬/스냅."
+    },
+    {
+      "category": "motion",
+      "alias": "set_xy",
+      "display_name_ko": "x: (0) y: (0) 위치로 이동하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "x",
+          "type": "number"
+        },
+        {
+          "name": "y",
+          "type": "number"
+        }
+      ],
+      "summary": "x,y 절대 좌표로 이동한다.",
+      "ai_usage_hint": "스폰/리셋."
+    },
+    {
+      "category": "motion",
+      "alias": "glide_to_xy",
+      "display_name_ko": "(2) 초 동안 x: (10) y: (10) 위치로 이동하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "seconds",
+          "type": "number"
+        },
+        {
+          "name": "x",
+          "type": "number"
+        },
+        {
+          "name": "y",
+          "type": "number"
+        }
+      ],
+      "summary": "입력한 시간 동안 목표 좌표로 이동한다.",
+      "ai_usage_hint": "부드러운 목적지 이동."
+    },
+    {
+      "category": "motion",
+      "alias": "go_to_object",
+      "display_name_ko": "[오브젝트] 위치로 이동하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "target",
+          "type": "object_or_mouse"
+        }
+      ],
+      "summary": "선택한 오브젝트나 마우스 위치로 이동한다.",
+      "ai_usage_hint": "추적/순간이동."
+    },
+    {
+      "category": "motion",
+      "alias": "glide_to_object",
+      "display_name_ko": "(2) 초 동안 [오브젝트] 위치로 이동하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "seconds",
+          "type": "number"
+        },
+        {
+          "name": "target",
+          "type": "object_or_mouse"
+        }
+      ],
+      "summary": "입력한 시간 동안 선택한 대상 위치로 이동한다.",
+      "ai_usage_hint": "부드러운 추적."
+    },
+    {
+      "category": "motion",
+      "alias": "turn_direction_by",
+      "display_name_ko": "방향을 (90º) 만큼 회전하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "degrees",
+          "type": "number"
+        }
+      ],
+      "summary": "오브젝트 방향을 회전한다.",
+      "ai_usage_hint": "스프라이트 방향 변경."
+    },
+    {
+      "category": "motion",
+      "alias": "turn_move_direction_by",
+      "display_name_ko": "이동 방향을 (90º) 만큼 회전하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "degrees",
+          "type": "number"
+        }
+      ],
+      "summary": "이동 방향을 회전한다.",
+      "ai_usage_hint": "실제 이동 벡터 회전."
+    },
+    {
+      "category": "motion",
+      "alias": "glide_turn_direction_by",
+      "display_name_ko": "(2) 초 동안 방향을 (90º) 만큼 회전하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "seconds",
+          "type": "number"
+        },
+        {
+          "name": "degrees",
+          "type": "number"
+        }
+      ],
+      "summary": "입력 시간 동안 방향을 회전한다.",
+      "ai_usage_hint": "부드러운 회전."
+    },
+    {
+      "category": "motion",
+      "alias": "glide_turn_move_direction_by",
+      "display_name_ko": "(2) 초 동안 이동 방향 (90º) 만큼 회전하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "seconds",
+          "type": "number"
+        },
+        {
+          "name": "degrees",
+          "type": "number"
+        }
+      ],
+      "summary": "입력 시간 동안 이동 방향을 회전한다.",
+      "ai_usage_hint": "진행 방향만 서서히 전환."
+    },
+    {
+      "category": "motion",
+      "alias": "set_direction",
+      "display_name_ko": "방향을 (90º) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "degrees",
+          "type": "number"
+        }
+      ],
+      "summary": "오브젝트 방향을 절대 각도로 정한다.",
+      "ai_usage_hint": "정면 기준 정렬."
+    },
+    {
+      "category": "motion",
+      "alias": "set_move_direction",
+      "display_name_ko": "이동 방향을 (90º) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "degrees",
+          "type": "number"
+        }
+      ],
+      "summary": "이동 방향을 절대 각도로 정한다.",
+      "ai_usage_hint": "이동 벡터 세팅."
+    },
+    {
+      "category": "looks",
+      "alias": "show",
+      "display_name_ko": "모양 보이기",
+      "kind": "stack",
+      "params": [],
+      "summary": "오브젝트를 보이게 한다.",
+      "ai_usage_hint": "등장 처리."
+    },
+    {
+      "category": "looks",
+      "alias": "hide",
+      "display_name_ko": "모양 숨기기",
+      "kind": "stack",
+      "params": [],
+      "summary": "오브젝트를 숨긴다.",
+      "ai_usage_hint": "퇴장 처리."
+    },
+    {
+      "category": "looks",
+      "alias": "say_for_seconds",
+      "display_name_ko": "(안녕!) 을(를) (4) 초 동안 [말하기]",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "text",
+          "type": "string"
+        },
+        {
+          "name": "seconds",
+          "type": "number"
+        },
+        {
+          "name": "bubble_type",
+          "type": "enum",
+          "example": "말하기"
+        }
+      ],
+      "summary": "입력한 내용을 일정 시간 말풍선으로 보여준다.",
+      "ai_usage_hint": "대화/생각 표현."
+    },
+    {
+      "category": "looks",
+      "alias": "say",
+      "display_name_ko": "(안녕!) 을(를) [말하기]",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "text",
+          "type": "string"
+        },
+        {
+          "name": "bubble_type",
+          "type": "enum",
+          "example": "생각하기"
+        }
+      ],
+      "summary": "입력한 내용을 말풍선으로 보여주고 바로 다음 블록으로 진행한다.",
+      "ai_usage_hint": "비동기 말풍선."
+    },
+    {
+      "category": "looks",
+      "alias": "clear_say",
+      "display_name_ko": "말하기 지우기",
+      "kind": "stack",
+      "params": [],
+      "summary": "현재 말풍선을 지운다.",
+      "ai_usage_hint": "UI 정리."
+    },
+    {
+      "category": "looks",
+      "alias": "switch_costume",
+      "display_name_ko": "(모양1) 모양으로 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "costume",
+          "type": "costume"
+        }
+      ],
+      "summary": "선택한 모양으로 바꾼다.",
+      "ai_usage_hint": "상태 전환."
+    },
+    {
+      "category": "looks",
+      "alias": "next_prev_costume",
+      "display_name_ko": "[다음] 모양으로 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "direction",
+          "type": "enum",
+          "example": "다음"
+        }
+      ],
+      "summary": "이전/다음 모양으로 전환한다.",
+      "ai_usage_hint": "프레임 애니메이션."
+    },
+    {
+      "category": "looks",
+      "alias": "change_effect_by",
+      "display_name_ko": "[색깔] 효과를 (10) 만큼 주기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "effect",
+          "type": "enum",
+          "example": "색깔"
+        },
+        {
+          "name": "delta",
+          "type": "number"
+        }
+      ],
+      "summary": "색깔/밝기/투명도 효과를 상대적으로 조절한다.",
+      "ai_usage_hint": "피격/점멸/투명화."
+    },
+    {
+      "category": "looks",
+      "alias": "set_effect",
+      "display_name_ko": "[색깔] 효과를 (100) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "effect",
+          "type": "enum",
+          "example": "투명도"
+        },
+        {
+          "name": "value",
+          "type": "number"
+        }
+      ],
+      "summary": "효과 값을 절대값으로 설정한다.",
+      "ai_usage_hint": "정확한 상태 세팅."
+    },
+    {
+      "category": "looks",
+      "alias": "clear_effects",
+      "display_name_ko": "효과 모두 지우기",
+      "kind": "stack",
+      "params": [],
+      "summary": "모든 생김새 효과를 지운다.",
+      "ai_usage_hint": "원복."
+    },
+    {
+      "category": "looks",
+      "alias": "change_size_by",
+      "display_name_ko": "크기를 (10) 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "delta",
+          "type": "number"
+        }
+      ],
+      "summary": "오브젝트 크기를 상대적으로 바꾼다.",
+      "ai_usage_hint": "줌 효과."
+    },
+    {
+      "category": "looks",
+      "alias": "set_size",
+      "display_name_ko": "크기를 (100) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "value",
+          "type": "number",
+          "min": 1
+        }
+      ],
+      "summary": "오브젝트 크기를 절대값으로 정한다.",
+      "ai_usage_hint": "정확한 크기 세팅."
+    },
+    {
+      "category": "looks",
+      "alias": "stretch_axis_by",
+      "display_name_ko": "[가로]를 (10) 만큼 늘이기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "axis",
+          "type": "enum",
+          "example": "가로"
+        },
+        {
+          "name": "delta",
+          "type": "number"
+        }
+      ],
+      "summary": "가로/세로 한 축만 늘이거나 줄인다.",
+      "ai_usage_hint": "찌그러짐 효과."
+    },
+    {
+      "category": "looks",
+      "alias": "restore_original_size",
+      "display_name_ko": "원래 크기로 되돌리기",
+      "kind": "stack",
+      "params": [],
+      "summary": "크기를 원래대로 돌린다.",
+      "ai_usage_hint": "일시적 변형 복구."
+    },
+    {
+      "category": "looks",
+      "alias": "flip_vertical",
+      "display_name_ko": "상하 모양 뒤집기",
+      "kind": "stack",
+      "params": [],
+      "summary": "모양을 세로 방향으로 뒤집는다.",
+      "ai_usage_hint": "캐릭터 반전 효과."
+    },
+    {
+      "category": "looks",
+      "alias": "flip_horizontal",
+      "display_name_ko": "좌우 모양 뒤집기",
+      "kind": "stack",
+      "params": [],
+      "summary": "모양을 가로 방향으로 뒤집는다.",
+      "ai_usage_hint": "좌우 반전."
+    },
+    {
+      "category": "looks",
+      "alias": "set_layer_order",
+      "display_name_ko": "[맨 앞으로] 보내기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "order",
+          "type": "enum",
+          "example": "맨 앞으로"
+        }
+      ],
+      "summary": "오브젝트의 앞뒤 순서를 바꾼다.",
+      "ai_usage_hint": "겹침 우선순위 조정."
+    },
+    {
+      "category": "brush",
+      "alias": "stamp",
+      "display_name_ko": "도장 찍기",
+      "kind": "stack",
+      "params": [],
+      "summary": "현재 위치에 오브젝트 모양을 도장처럼 찍는다.",
+      "ai_usage_hint": "궤적 잔상."
+    },
+    {
+      "category": "brush",
+      "alias": "pen_down",
+      "display_name_ko": "그리기 시작하기",
+      "kind": "stack",
+      "params": [],
+      "summary": "움직이는 경로를 따라 선을 그리기 시작한다.",
+      "ai_usage_hint": "선 그리기 시작."
+    },
+    {
+      "category": "brush",
+      "alias": "pen_up",
+      "display_name_ko": "그리기 멈추기",
+      "kind": "stack",
+      "params": [],
+      "summary": "그리기를 멈춘다. 이미 그린 것은 유지된다.",
+      "ai_usage_hint": "선 그리기 종료."
+    },
+    {
+      "category": "brush",
+      "alias": "set_pen_color",
+      "display_name_ko": "그리기 색을 [◾︎] / (#FF0000) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "color",
+          "type": "color_or_hex"
+        }
+      ],
+      "summary": "그리기 선 색을 정한다.",
+      "ai_usage_hint": "직접 색 지정."
+    },
+    {
+      "category": "brush",
+      "alias": "change_pen_width_by",
+      "display_name_ko": "그리기 굵기를 (1) 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "delta",
+          "type": "number"
+        }
+      ],
+      "summary": "선 굵기를 상대적으로 바꾼다.",
+      "ai_usage_hint": "펜 굵기 변화."
+    },
+    {
+      "category": "brush",
+      "alias": "set_pen_width",
+      "display_name_ko": "그리기 굵기를 (1) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "value",
+          "type": "number",
+          "min": 1
+        }
+      ],
+      "summary": "선 굵기를 절대값으로 정한다.",
+      "ai_usage_hint": "고정 굵기."
+    },
+    {
+      "category": "brush",
+      "alias": "fill_start",
+      "display_name_ko": "채우기 시작하기",
+      "kind": "stack",
+      "params": [],
+      "summary": "경로 내부를 채우기 시작한다.",
+      "ai_usage_hint": "다각형 채우기."
+    },
+    {
+      "category": "brush",
+      "alias": "fill_end",
+      "display_name_ko": "채우기 멈추기",
+      "kind": "stack",
+      "params": [],
+      "summary": "채우기를 멈춘다. 이미 채운 것은 유지된다.",
+      "ai_usage_hint": "채우기 종료."
+    },
+    {
+      "category": "brush",
+      "alias": "set_fill_color",
+      "display_name_ko": "채우기 색을 [◾︎] / (#FF0000) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "color",
+          "type": "color_or_hex"
+        }
+      ],
+      "summary": "채우기 색을 정한다.",
+      "ai_usage_hint": "면 색 지정."
+    },
+    {
+      "category": "brush",
+      "alias": "set_random_brush_color",
+      "display_name_ko": "붓의 색을 무작위로 정하기",
+      "kind": "stack",
+      "params": [],
+      "summary": "그리기/채우기 색을 무작위로 정한다.",
+      "ai_usage_hint": "랜덤 아트."
+    },
+    {
+      "category": "brush",
+      "alias": "change_brush_alpha_by",
+      "display_name_ko": "붓의 투명도를 (10) % 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "delta_percent",
+          "type": "number"
+        }
+      ],
+      "summary": "붓 투명도를 상대적으로 바꾼다.",
+      "ai_usage_hint": "흐림 효과."
+    },
+    {
+      "category": "text",
+      "alias": "text_box_content",
+      "display_name_ko": "글상자 [글상자] 의 내용",
+      "kind": "reporter",
+      "params": [
+        {
+          "name": "text_box",
+          "type": "text_box"
+        }
+      ],
+      "summary": "선택한 글상자의 내용을 가져온다.",
+      "ai_usage_hint": "글상자 기반 UI 읽기."
+    },
+    {
+      "category": "text",
+      "alias": "write_text",
+      "display_name_ko": "(엔트리) (이)라고 글쓰기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "text",
+          "type": "string"
+        }
+      ],
+      "summary": "글상자의 내용을 입력한 텍스트로 바꾼다.",
+      "ai_usage_hint": "UI 텍스트 출력."
+    },
+    {
+      "category": "text",
+      "alias": "append_text",
+      "display_name_ko": "(엔트리) 을(를) 뒤에 추가하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "text",
+          "type": "string"
+        }
+      ],
+      "summary": "글상자 뒤에 내용을 덧붙인다.",
+      "ai_usage_hint": "로그/누적 출력."
+    },
+    {
+      "category": "sound",
+      "alias": "play_sound",
+      "display_name_ko": "소리 ([소리]) 재생하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        }
+      ],
+      "summary": "선택한 소리를 재생하고 바로 다음 블록으로 넘어간다.",
+      "ai_usage_hint": "효과음."
+    },
+    {
+      "category": "sound",
+      "alias": "play_sound_for_seconds",
+      "display_name_ko": "소리 ([소리]) (1) 초 재생하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        },
+        {
+          "name": "seconds",
+          "type": "number"
+        }
+      ],
+      "summary": "처음부터 입력 시간만큼 재생한다.",
+      "ai_usage_hint": "일부분만 재생."
+    },
+    {
+      "category": "sound",
+      "alias": "play_sound_range",
+      "display_name_ko": "소리 ([소리]) (1) 초 부터 (10) 초 까지 재생하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        },
+        {
+          "name": "start_sec",
+          "type": "number"
+        },
+        {
+          "name": "end_sec",
+          "type": "number"
+        }
+      ],
+      "summary": "지정 구간만 재생한다.",
+      "ai_usage_hint": "샘플링/클립 재생."
+    },
+    {
+      "category": "sound",
+      "alias": "play_sound_and_wait",
+      "display_name_ko": "소리 ([소리]) 재생하고 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        }
+      ],
+      "summary": "소리 재생이 끝날 때까지 기다린다.",
+      "ai_usage_hint": "내레이션 순차 진행."
+    },
+    {
+      "category": "sound",
+      "alias": "play_sound_for_seconds_and_wait",
+      "display_name_ko": "소리 ([소리]) (1) 초 재생하고 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        },
+        {
+          "name": "seconds",
+          "type": "number"
+        }
+      ],
+      "summary": "입력 시간만큼 재생 후 기다린다.",
+      "ai_usage_hint": "부분 구간 순차 처리."
+    },
+    {
+      "category": "sound",
+      "alias": "play_sound_range_and_wait",
+      "display_name_ko": "소리 ([소리]) (1) 초 부터 (10) 초까지 재생하고 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        },
+        {
+          "name": "start_sec",
+          "type": "number"
+        },
+        {
+          "name": "end_sec",
+          "type": "number"
+        }
+      ],
+      "summary": "구간 재생 후 기다린다.",
+      "ai_usage_hint": "샘플 구간 순차 재생."
+    },
+    {
+      "category": "sound",
+      "alias": "sound_length",
+      "display_name_ko": "([소리]) 소리의 길이",
+      "kind": "reporter",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        }
+      ],
+      "summary": "소리 길이를 가져온다.",
+      "ai_usage_hint": "타이밍 계산."
+    },
+    {
+      "category": "sound",
+      "alias": "master_volume",
+      "display_name_ko": "소리 크기",
+      "kind": "reporter",
+      "params": [],
+      "summary": "현재 작품의 전체 소리 크기를 가져온다.",
+      "ai_usage_hint": "음량 상태 확인."
+    },
+    {
+      "category": "sound",
+      "alias": "change_master_volume_by",
+      "display_name_ko": "소리 크기를 (10) 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "delta",
+          "type": "number"
+        }
+      ],
+      "summary": "전체 소리 크기를 상대 조절한다.",
+      "ai_usage_hint": "볼륨 업다운."
+    },
+    {
+      "category": "sound",
+      "alias": "set_master_volume",
+      "display_name_ko": "소리 크기를 (10) % 로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "percent",
+          "type": "number",
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "summary": "전체 소리 크기를 절대값으로 정한다.",
+      "ai_usage_hint": "설정 메뉴."
+    },
+    {
+      "category": "sound",
+      "alias": "sound_speed",
+      "display_name_ko": "소리 빠르기",
+      "kind": "reporter",
+      "params": [],
+      "summary": "현재 작품의 전체 소리 빠르기를 가져온다.",
+      "ai_usage_hint": "재생속도 상태 확인."
+    },
+    {
+      "category": "sound",
+      "alias": "change_sound_speed_by",
+      "display_name_ko": "소리 빠르기를 (0.1) 만큼 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "delta",
+          "type": "number"
+        }
+      ],
+      "summary": "전체 소리 빠르기를 상대 조절한다.",
+      "ai_usage_hint": "코믹/슬로우 모션."
+    },
+    {
+      "category": "sound",
+      "alias": "set_sound_speed",
+      "display_name_ko": "소리 빠르기를 (1) 배로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "value",
+          "type": "number",
+          "min": 0.5,
+          "max": 2
+        }
+      ],
+      "summary": "전체 소리 빠르기를 절대값으로 정한다.",
+      "ai_usage_hint": "고정 재생속도."
+    },
+    {
+      "category": "sound",
+      "alias": "stop_sounds",
+      "display_name_ko": "모든 소리 멈추기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "target",
+          "type": "enum",
+          "example": "모든"
+        }
+      ],
+      "summary": "선택 범위의 소리를 멈춘다. 배경음악은 제외된다.",
+      "ai_usage_hint": "효과음 정리."
+    },
+    {
+      "category": "sound",
+      "alias": "play_bgm",
+      "display_name_ko": "([소리]) 을(를) 배경음악으로 재생하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "sound",
+          "type": "sound"
+        }
+      ],
+      "summary": "선택한 소리를 배경음악으로 재생한다.",
+      "ai_usage_hint": "장면 넘어가도 유지."
+    },
+    {
+      "category": "sound",
+      "alias": "stop_bgm",
+      "display_name_ko": "배경음악 멈추기",
+      "kind": "stack",
+      "params": [],
+      "summary": "재생 중인 배경음악을 멈춘다.",
+      "ai_usage_hint": "음악 종료."
+    },
+    {
+      "category": "data",
+      "alias": "ask_and_wait",
+      "display_name_ko": "(안녕!) 을(를) 묻고 대답 기다리기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "question",
+          "type": "string"
+        }
+      ],
+      "summary": "질문을 띄우고 대답 입력을 기다린다.",
+      "ai_usage_hint": "간단한 입력 UI."
+    },
+    {
+      "category": "data",
+      "alias": "answer",
+      "display_name_ko": "대답",
+      "kind": "reporter",
+      "params": [],
+      "summary": "대답창에 입력된 값을 가져온다.",
+      "ai_usage_hint": "사용자 입력 읽기."
+    },
+    {
+      "category": "data",
+      "alias": "show_hide_answer",
+      "display_name_ko": "대답 [숨기기]",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "mode",
+          "type": "enum",
+          "example": "숨기기"
+        }
+      ],
+      "summary": "대답창을 숨기거나 나타낸다.",
+      "ai_usage_hint": "입력 UI 제어."
+    },
+    {
+      "category": "data",
+      "alias": "variable_value",
+      "display_name_ko": "[변수] 값",
+      "kind": "reporter",
+      "params": [
+        {
+          "name": "variable",
+          "type": "variable"
+        }
+      ],
+      "summary": "변수 값을 가져온다.",
+      "ai_usage_hint": "상태 참조."
+    },
+    {
+      "category": "data",
+      "alias": "add_to_variable",
+      "display_name_ko": "[변수] 에 (10) 만큼 더하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "variable",
+          "type": "variable"
+        },
+        {
+          "name": "value",
+          "type": "number_or_string"
+        }
+      ],
+      "summary": "숫자면 더하고, 문자면 뒤에 이어 붙인다.",
+      "ai_usage_hint": "점수 증가/문자 누적."
+    },
+    {
+      "category": "data",
+      "alias": "set_variable",
+      "display_name_ko": "[변수] 를 (10) (으)로 정하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "variable",
+          "type": "variable"
+        },
+        {
+          "name": "value",
+          "type": "any"
+        }
+      ],
+      "summary": "변수 값을 새 값으로 정한다.",
+      "ai_usage_hint": "상태 초기화."
+    },
+    {
+      "category": "data",
+      "alias": "show_variable",
+      "display_name_ko": "변수 [변수] 보이기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "variable",
+          "type": "variable"
+        }
+      ],
+      "summary": "변수 모니터를 보이게 한다.",
+      "ai_usage_hint": "디버깅/게임 UI."
+    },
+    {
+      "category": "data",
+      "alias": "hide_variable",
+      "display_name_ko": "변수 [변수] 숨기기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "variable",
+          "type": "variable"
+        }
+      ],
+      "summary": "변수 모니터를 숨긴다.",
+      "ai_usage_hint": "UI 정리."
+    },
+    {
+      "category": "data",
+      "alias": "list_item",
+      "display_name_ko": "[리스트] 의 (1) 번째 항목",
+      "kind": "reporter",
+      "params": [
+        {
+          "name": "list",
+          "type": "list"
+        },
+        {
+          "name": "index",
+          "type": "number"
+        }
+      ],
+      "summary": "리스트 항목을 가져온다.",
+      "ai_usage_hint": "목록 조회."
+    },
+    {
+      "category": "data",
+      "alias": "append_list_item",
+      "display_name_ko": "(10) 항목을 [리스트] 에 추가하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "value",
+          "type": "any"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "summary": "리스트 마지막에 항목을 추가한다.",
+      "ai_usage_hint": "로그/큐."
+    },
+    {
+      "category": "data",
+      "alias": "delete_list_item",
+      "display_name_ko": "(1) 번째 항목을 [리스트] 에서 삭제하기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "index",
+          "type": "number"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "summary": "지정 항목을 삭제한다.",
+      "ai_usage_hint": "정리/소모."
+    },
+    {
+      "category": "data",
+      "alias": "insert_list_item",
+      "display_name_ko": "(10) 을(를) [리스트] 의 (1) 번째에 넣기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "value",
+          "type": "any"
+        },
+        {
+          "name": "list",
+          "type": "list"
+        },
+        {
+          "name": "index",
+          "type": "number"
+        }
+      ],
+      "summary": "지정 위치에 항목을 삽입한다.",
+      "ai_usage_hint": "우선순위 삽입."
+    },
+    {
+      "category": "data",
+      "alias": "replace_list_item",
+      "display_name_ko": "[리스트] (1) 번째 항목을 (10) (으)로 바꾸기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "list",
+          "type": "list"
+        },
+        {
+          "name": "index",
+          "type": "number"
+        },
+        {
+          "name": "value",
+          "type": "any"
+        }
+      ],
+      "summary": "지정 항목을 새 값으로 바꾼다.",
+      "ai_usage_hint": "업데이트."
+    },
+    {
+      "category": "data",
+      "alias": "list_length",
+      "display_name_ko": "[리스트] 항목 수",
+      "kind": "reporter",
+      "params": [
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "summary": "리스트 길이를 가져온다.",
+      "ai_usage_hint": "반복 범위 계산."
+    },
+    {
+      "category": "data",
+      "alias": "list_contains",
+      "display_name_ko": "[리스트] 에 (10) 이 포함되어 있는가?",
+      "kind": "boolean",
+      "params": [
+        {
+          "name": "list",
+          "type": "list"
+        },
+        {
+          "name": "value",
+          "type": "any"
+        }
+      ],
+      "summary": "리스트에 값이 있는지 검사한다.",
+      "ai_usage_hint": "중복 체크."
+    },
+    {
+      "category": "data",
+      "alias": "show_list",
+      "display_name_ko": "리스트 [리스트] 보이기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "summary": "리스트를 화면에 보이게 한다.",
+      "ai_usage_hint": "디버깅/UI."
+    },
+    {
+      "category": "data",
+      "alias": "hide_list",
+      "display_name_ko": "리스트 [리스트] 숨기기",
+      "kind": "stack",
+      "params": [
+        {
+          "name": "list",
+          "type": "list"
+        }
+      ],
+      "summary": "리스트를 화면에서 숨긴다.",
+      "ai_usage_hint": "UI 정리."
+    }
+  ],
+  "unsupported_or_later": [
+    {
+      "category": "judgement",
+      "reason": "공식 문서상 판단 블록 전용 페이지가 있으나 v1 카탈로그에서는 조건식 빌더로 통합하는 편이 구현이 쉬움.",
+      "suggestion": "마우스/키/충돌/같다/크다/작다/그리고/또는/아니다 류를 별도 boolean catalog로 추가."
+    },
+    {
+      "category": "calculation",
+      "reason": "계산 블록 수가 많고 숫자/문자/랜덤/반올림/길이/색상 변환 등 하위 유형이 다양함.",
+      "suggestion": "숫자 계산과 문자열 계산을 분리한 reporter catalog로 2차 추가."
+    },
+    {
+      "category": "function",
+      "reason": "함수는 개별 블록 목록보다는 함수 정의/호출/인자/지역변수 모델이 중요함.",
+      "suggestion": "create_function, call_function, return_value 수준의 추상 action으로 다루기."
+    },
+    {
+      "category": "table",
+      "reason": "테이블은 프로젝트에 테이블이 있어야 하고 행/열/속성 개념을 함께 넘겨야 함.",
+      "suggestion": "테이블 존재 시에만 활성화."
+    },
+    {
+      "category": "ai",
+      "reason": "카메라/인터넷/모델 파일 등 외부 의존성이 많음.",
+      "suggestion": "환경 검사 결과가 true일 때만 AI가 제안하도록 제한."
+    },
+    {
+      "category": "expansion",
+      "reason": "외부 API/확장 블록은 환경에 따라 가용성이 달라짐.",
+      "suggestion": "enabled_extensions 목록을 현재 프로젝트 스냅샷에 포함."
+    },
+    {
+      "category": "hardware",
+      "reason": "연결된 하드웨어 종류별 전용 블록 세트가 달라짐.",
+      "suggestion": "연결 모듈 메타데이터를 읽어 별도 catalog로 병합."
+    }
+  ]
+}
