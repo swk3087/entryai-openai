@@ -12,6 +12,11 @@ const SYSTEM_PROMPT = [
     'Always preserve unrelated project data unless the user clearly asked to remove or replace it.',
     'When the request is ambiguous, make the smallest safe change that still satisfies the request.',
     'If the user is asking a question instead of requesting a change, keep updatedProject unchanged and answer in assistantMessage.',
+    'Important: every object.script and function.content value must stay a serialized JSON string, not a raw array or object.',
+    'Each script/content string must JSON.parse to an array of threads.',
+    'Each thread must be an array of block objects.',
+    'Each block object must keep its nested statements as an array of threads, where each statement item is again an array of block objects.',
+    'If you are not editing a script/content field, copy the existing string exactly.',
     'Return valid JSON only.',
     'Do not include markdown, code fences, or any extra text.',
     'The JSON must be an object with exactly these top-level keys: assistantMessage, changeSummary, updatedProject.',
@@ -52,6 +57,113 @@ function extractOutputText(data: any) {
     return text;
 }
 
+function isObjectRecord(value: unknown): value is Record<string, any> {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function validateBlockThread(thread: unknown, path: string) {
+    if (!Array.isArray(thread)) {
+        throw new Error(`${path}는 블록 배열(thread)이어야 합니다.`);
+    }
+
+    thread.forEach((block, index) => {
+        const blockPath = `${path}[${index}]`;
+        if (!isObjectRecord(block)) {
+            throw new Error(`${blockPath}는 블록 객체여야 합니다.`);
+        }
+
+        if (typeof block.id !== 'string' || !block.id.trim()) {
+            throw new Error(`${blockPath}.id는 비어 있지 않은 문자열이어야 합니다.`);
+        }
+
+        if (typeof block.type !== 'string' || !block.type.trim()) {
+            throw new Error(`${blockPath}.type은 비어 있지 않은 문자열이어야 합니다.`);
+        }
+
+        if ('params' in block && !Array.isArray(block.params)) {
+            throw new Error(`${blockPath}.params는 배열이어야 합니다.`);
+        }
+
+        if ('extensions' in block && !Array.isArray(block.extensions)) {
+            throw new Error(`${blockPath}.extensions는 배열이어야 합니다.`);
+        }
+
+        if (!Array.isArray(block.statements)) {
+            throw new Error(`${blockPath}.statements는 배열이어야 합니다.`);
+        }
+
+        block.statements.forEach((statementThread: unknown, statementIndex: number) => {
+            validateBlockThread(statementThread, `${blockPath}.statements[${statementIndex}]`);
+        });
+    });
+}
+
+function validateSerializedScript(
+    scriptValue: unknown,
+    path: string,
+    options?: { allowEmpty?: boolean }
+) {
+    if (typeof scriptValue !== 'string') {
+        throw new Error(`${path}는 문자열이어야 합니다.`);
+    }
+
+    const trimmedValue = scriptValue.trim();
+    if (!trimmedValue) {
+        if (options?.allowEmpty) {
+            return;
+        }
+        throw new Error(`${path}가 비어 있습니다.`);
+    }
+
+    let parsedScript;
+    try {
+        parsedScript = JSON.parse(trimmedValue);
+    } catch (error) {
+        throw new Error(`${path}는 JSON 문자열이어야 합니다.`);
+    }
+
+    if (!Array.isArray(parsedScript)) {
+        throw new Error(`${path}는 스레드 배열(JSON array)이어야 합니다.`);
+    }
+
+    parsedScript.forEach((thread, index) => {
+        validateBlockThread(thread, `${path}[${index}]`);
+    });
+}
+
+function validateProjectStructure(project: Record<string, any>) {
+    if (!Array.isArray(project.objects)) {
+        throw new Error('AI 응답의 updatedProject.objects가 배열이 아닙니다.');
+    }
+
+    project.objects.forEach((object, index) => {
+        const objectPath = `updatedProject.objects[${index}]`;
+        if (!isObjectRecord(object)) {
+            throw new Error(`${objectPath}는 객체여야 합니다.`);
+        }
+
+        validateSerializedScript(object.script, `${objectPath}.script`, {
+            allowEmpty: false,
+        });
+    });
+
+    if ('functions' in project && !Array.isArray(project.functions)) {
+        throw new Error('AI 응답의 updatedProject.functions가 배열이 아닙니다.');
+    }
+
+    const functions = Array.isArray(project.functions) ? project.functions : [];
+    functions.forEach((func, index) => {
+        const functionPath = `updatedProject.functions[${index}]`;
+        if (!isObjectRecord(func)) {
+            throw new Error(`${functionPath}는 객체여야 합니다.`);
+        }
+
+        validateSerializedScript(func.content, `${functionPath}.content`, {
+            allowEmpty: false,
+        });
+    });
+}
+
 function validateResponse(outputText: string): IAIProjectUpdateResponse {
     const parsed = JSON.parse(outputText);
 
@@ -75,9 +187,7 @@ function validateResponse(outputText: string): IAIProjectUpdateResponse {
         throw new Error('AI 응답의 updatedProject가 객체가 아닙니다.');
     }
 
-    if (!Array.isArray(parsed.updatedProject.objects)) {
-        throw new Error('AI 응답의 updatedProject.objects가 배열이 아닙니다.');
-    }
+    validateProjectStructure(parsed.updatedProject);
 
     return {
         assistantMessage: parsed.assistantMessage.trim(),
@@ -136,12 +246,15 @@ function extractErrorMessage(error: unknown) {
 }
 
 export default class OpenAIProjectEditor {
-    private static buildInput(request: IAIGenerateProjectRequest) {
+    private static buildInput(request: IAIGenerateProjectRequest, validationFeedback?: string) {
         const conversationContext = buildConversationContext(request.messages);
         return [
             `Project name: ${request.projectName}`,
             conversationContext ? `Conversation history:\n${conversationContext}` : '',
             `Latest user request:\n${request.prompt.trim()}`,
+            validationFeedback ?
+                `Previous response validation error:\n${validationFeedback}\nFix the response and return a fully corrected project.` :
+                '',
             `Current project JSON:\n${JSON.stringify(request.currentProject, null, 2)}`,
         ]
             .filter(Boolean)
@@ -150,7 +263,8 @@ export default class OpenAIProjectEditor {
 
     private static async requestProjectUpdate(
         request: IAIGenerateProjectRequest,
-        retryCount = 0
+        retryCount = 0,
+        validationFeedback?: string
     ): Promise<IAIProjectUpdateResponse> {
         const { settings } = request;
         const trimmedApiKey = settings.apiKey.trim();
@@ -168,7 +282,7 @@ export default class OpenAIProjectEditor {
             {
                 model: settings.model,
                 instructions: SYSTEM_PROMPT,
-                input: this.buildInput(request),
+                input: this.buildInput(request, validationFeedback),
                 store: false,
                 max_output_tokens: settings.maxOutputTokens,
                 ...(settings.model.startsWith('gpt-5') ?
@@ -194,12 +308,25 @@ export default class OpenAIProjectEditor {
         );
 
         const outputText = extractOutputText(response.data);
-        const parsedResponse = validateResponse(outputText);
+        let parsedResponse: IAIProjectUpdateResponse;
+        try {
+            parsedResponse = validateResponse(outputText);
+        } catch (error) {
+            if (retryCount < 1 && error instanceof Error) {
+                return this.requestProjectUpdate(request, retryCount + 1, error.message);
+            }
+
+            throw error;
+        }
         const outputTokens = getApproximateOutputTokens(response.data, outputText);
 
         if (settings.minOutputTokens > 0 && outputTokens < settings.minOutputTokens) {
             if (retryCount < 1) {
-                return this.requestProjectUpdate(request, retryCount + 1);
+                return this.requestProjectUpdate(
+                    request,
+                    retryCount + 1,
+                    'Previous response was too short. Return a fuller but still valid project update.'
+                );
             }
 
             throw new Error(
