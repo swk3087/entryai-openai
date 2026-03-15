@@ -6,37 +6,18 @@ import {
     IAIProjectUpdateResponse,
 } from '../../common/ai';
 
-const RESPONSE_SCHEMA = {
-    type: 'object',
-    additionalProperties: false,
-    required: ['assistantMessage', 'changeSummary', 'updatedProject'],
-    properties: {
-        assistantMessage: {
-            type: 'string',
-            description:
-                'A short natural-language assistant reply explaining what changed or why no change was needed.',
-        },
-        changeSummary: {
-            type: 'array',
-            description: 'Short human-readable list of project changes.',
-            items: {
-                type: 'string',
-            },
-        },
-        updatedProject: {
-            type: 'object',
-            description: 'The full updated Entry project JSON.',
-        },
-    },
-};
-
 const SYSTEM_PROMPT = [
     'You are the AI project editor inside Entry Offline.',
     'The user is editing an Entry project. You receive the conversation history, the latest user request, the current full project JSON, and an Entry block catalog.',
     'Always preserve unrelated project data unless the user clearly asked to remove or replace it.',
     'When the request is ambiguous, make the smallest safe change that still satisfies the request.',
     'If the user is asking a question instead of requesting a change, keep updatedProject unchanged and answer in assistantMessage.',
-    'Return valid JSON only that matches the provided schema.',
+    'Return valid JSON only.',
+    'Do not include markdown, code fences, or any extra text.',
+    'The JSON must be an object with exactly these top-level keys: assistantMessage, changeSummary, updatedProject.',
+    'assistantMessage must be a string.',
+    'changeSummary must be an array of strings.',
+    'updatedProject must be the full Entry project JSON object.',
     `Entry block catalog:\n${JSON.stringify(blockCatalog, null, 2)}`,
 ].join('\n\n');
 
@@ -199,10 +180,7 @@ export default class OpenAIProjectEditor {
                     {}),
                 text: {
                     format: {
-                        type: 'json_schema',
-                        name: 'entry_project_update',
-                        strict: true,
-                        schema: RESPONSE_SCHEMA,
+                        type: 'json_object',
                     },
                 },
             },
