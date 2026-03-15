@@ -98,19 +98,33 @@ function validateBlockThread(thread: unknown, path: string) {
     });
 }
 
+function normalizeSerializedScriptValue(value: unknown) {
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    if (Array.isArray(value) || isObjectRecord(value)) {
+        return JSON.stringify(value);
+    }
+
+    return value;
+}
+
 function validateSerializedScript(
     scriptValue: unknown,
     path: string,
     options?: { allowEmpty?: boolean }
 ) {
-    if (typeof scriptValue !== 'string') {
+    const normalizedValue = normalizeSerializedScriptValue(scriptValue);
+
+    if (typeof normalizedValue !== 'string') {
         throw new Error(`${path}는 문자열이어야 합니다.`);
     }
 
-    const trimmedValue = scriptValue.trim();
+    const trimmedValue = normalizedValue.trim();
     if (!trimmedValue) {
         if (options?.allowEmpty) {
-            return;
+            return normalizedValue;
         }
         throw new Error(`${path}가 비어 있습니다.`);
     }
@@ -129,6 +143,8 @@ function validateSerializedScript(
     parsedScript.forEach((thread, index) => {
         validateBlockThread(thread, `${path}[${index}]`);
     });
+
+    return normalizedValue;
 }
 
 function validateProjectStructure(project: Record<string, any>) {
@@ -142,7 +158,7 @@ function validateProjectStructure(project: Record<string, any>) {
             throw new Error(`${objectPath}는 객체여야 합니다.`);
         }
 
-        validateSerializedScript(object.script, `${objectPath}.script`, {
+        object.script = validateSerializedScript(object.script, `${objectPath}.script`, {
             allowEmpty: false,
         });
     });
@@ -158,7 +174,7 @@ function validateProjectStructure(project: Record<string, any>) {
             throw new Error(`${functionPath}는 객체여야 합니다.`);
         }
 
-        validateSerializedScript(func.content, `${functionPath}.content`, {
+        func.content = validateSerializedScript(func.content, `${functionPath}.content`, {
             allowEmpty: false,
         });
     });
